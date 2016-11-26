@@ -7,6 +7,11 @@ var model = 'https://api.projectoxford.ai/luis/v2.0/apps/ef759c58-7bca-4c77-ba28
 var CODE = '963c3bc73ac6fe55c4278c38aeb3c1fa97937fe6d721fd74bb5304dcfec8eca0';
 var CLIENT_ID = 'bc9ddc5faa820489de13ac23f998fe79d55a9e880b5faaa0353321630539822d';
 var CLIENT_SECRET = '257385f6b195fc8854255219540e0ff0f22d42ad2a09b5e8a2400440b0322e84';
+var CREATE_DROPLET_DATA = {
+    "region": 'nyc1,nyc2,nyc3',
+    "size": '512mb,1gb',
+    "image": 'ubuntu-14-04-x64,ubuntu-14-04-x32'
+}
 
 app.get('/callback', function (req, res) {
     if (req.query.code != undefined) {
@@ -15,7 +20,7 @@ app.get('/callback', function (req, res) {
         request.post(URL, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 accessToken = JSON.parse(body).accessToken;
-                res.setHeader('content-type','application/JSON')
+                res.setHeader('content-type', 'application/JSON')
                 res.send(body);
             }
         })
@@ -33,49 +38,36 @@ app.get('/home', function (req, res) {
     if (req.query.searchQuery != undefined) {
         request(model + '&q=' + req.query.searchQuery, function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                console.log(JSON.parse(body).topScoringIntent)
-                var digitalocean = new DIGITALOCEAN(accessToken);
-                var myNewDropletData = {
-                    "name": "example.com",
-                    "region": "nyc3",
-                    "size": "512mb",
-                    "image": "ubuntu-14-04-x64",
-                    "ssh_keys": null,
-                    "backups": false,
-                    "ipv6": true,
-                    "user_data": null,
-                    "private_networking": null
+                console.log(JSON.parse(body).topScoringIntent);
+                var detectedIntent = JSON.parse(body).topScoringIntent.intent;
+                if (detectedIntent = 'createDroplet') {
+                    res.setHeader('content-type', 'application/JSON')
+                    res.send(CREATE_DROPLET_DATA);
+                } else {
+                    res.send(detectedIntent);
                 }
-
-                digitalocean.createDroplet(myNewDropletData, function (error, result) {
-                    if (error) {
-                        console.log(error);
-                    }
-                    else {
-                        console.log(result);
-                    }
-                });
-                res.send(JSON.parse(body).topScoringIntent.intent);
             }
-
         })
+    }
+    else if (req.query.createDropletData != undefined) {
+        var name = JSON.parse(req.query.createDropletData).name;
+        var region = JSON.parse(req.query.createDropletData).region;
+        var size = JSON.parse(req.query.createDropletData).size;
+        var image = JSON.parse(req.query.createDropletData).image;
+        createDroplet(name, region, size, image);
     }
     else {
         res.send("please send search query.")
     }
 })
 
-app.post('/home', function (req, res) {
-    res.send("At this moment, it is not defined.");
-})
-
-app.get('/createDroplet', function (req, res) {
-    var digitalocean = new DIGITALOCEAN('');
+function createDroplet(name,region,size,image) {
+    var digitalocean = new DIGITALOCEAN(accessToken);
     var myNewDropletData = {
-        "name": "example.com",
-        "region": "nyc3",
-        "size": "512mb",
-        "image": "ubuntu-14-04-x64",
+        "name": name,
+        "region": region,
+        "size": size,
+        "image": image,
         "ssh_keys": null,
         "backups": false,
         "ipv6": true,
@@ -86,11 +78,17 @@ app.get('/createDroplet', function (req, res) {
     digitalocean.createDroplet(myNewDropletData, function (error, result) {
         if (error) {
             console.log(error);
+            res.send(error);
         }
         else {
+            res.send(result);
             console.log(result);
         }
     });
+};
+
+app.post('/home', function (req, res) {
+    res.send("At this moment, it is not defined.");
 })
 
 var server = app.listen(8083, function () {
