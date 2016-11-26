@@ -1,0 +1,30 @@
+{
+  "name": "digital_ocean_hack",
+  "version": "1.0.0",
+  "description": "chatbot for digital ocean",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "dropletapi": "^3.1.0",
+    "express": "^4.14.0",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "none",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AadityaDev/DigitalOceanHack-Web-.git"
+  },
+  "keywords": [
+    "chatbot"
+  ],
+  "author": "Samarth Shah",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AadityaDev/DigitalOceanHack-Web-/issues"
+  },
+  "homepage": "https://github.com/AadityaDev/DigitalOceanHack-Web-#readme"
+}
