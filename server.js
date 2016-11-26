@@ -8,9 +8,10 @@ var CODE = '963c3bc73ac6fe55c4278c38aeb3c1fa97937fe6d721fd74bb5304dcfec8eca0';
 var CLIENT_ID = 'bc9ddc5faa820489de13ac23f998fe79d55a9e880b5faaa0353321630539822d';
 var CLIENT_SECRET = '257385f6b195fc8854255219540e0ff0f22d42ad2a09b5e8a2400440b0322e84';
 var CREATE_DROPLET_DATA = {
-    "region": 'nyc1,nyc2,nyc3',
-    "size": '512mb,1gb',
-    "image": 'ubuntu-14-04-x64,ubuntu-14-04-x32'
+    "name":'hostname',
+    "region": ['nyc1','nyc2','nyc3','sfo1','ams2','sgp1','lon1','nyc3','ams3','fra1','tor1','sfo2','blr1'],
+    "size": ['512mb','1gb'],
+    "images": ['ubuntu-14-04-x64','ubuntu-14-04-x32']
 }
 
 app.get('/callback', function (req, res) {
@@ -53,7 +54,7 @@ app.get('/home', function (req, res) {
         var name = JSON.parse(req.query.createDropletData).name;
         var region = JSON.parse(req.query.createDropletData).region;
         var size = JSON.parse(req.query.createDropletData).size;
-        var image = JSON.parse(req.query.createDropletData).image;
+        var image = JSON.parse(req.query.createDropletData).images;
         createDroplet(name, region, size, image);
     }
     else {
