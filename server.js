@@ -1,7 +1,7 @@
 var express = require('express');
 var request = require('request');
 var app = express();
-var accessToken = '1d54dec1716d7c6a96a16ee33507b80b0a27b95db57670efcabaa4cb9e7fece4';
+var accessToken = '4a51a776c8ef3d44f0820406d43fa7e51862c1951979cbd9dfe9209256519cbf';
 var DIGITALOCEAN = require('dropletapi').Droplets;
 var model = 'https://api.projectoxford.ai/luis/v2.0/apps/ef759c58-7bca-4c77-ba28-e40146764b0b?subscription-key=dfa71d213f1b4645b249e95ece228af6'
 var CODE = '963c3bc73ac6fe55c4278c38aeb3c1fa97937fe6d721fd74bb5304dcfec8eca0';
@@ -20,7 +20,8 @@ app.get('/callback', function (req, res) {
         var URL = 'https://cloud.digitalocean.com/v1/oauth/token?grant_type=authorization_code&code=' + CODE + '&client_id=' + CLIENT_ID + '&client_secret=' + CLIENT_SECRET + '&redirect_uri=http://104.131.39.100:8083/callback';
         request.post(URL, function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                accessToken = JSON.parse(body).accessToken;
+                accessToken = JSON.parse(body).access_token;
+                console.log(accessToken);
                 res.setHeader('content-type', 'application/JSON')
                 res.send(body);
             }
@@ -36,13 +37,13 @@ app.post('/accessToken', function (req, res) {
 })
 
 app.get('/home', function (req, res) {
+    res.setHeader('content-type', 'application/JSON');
     if (req.query.searchQuery != undefined) {
         request(model + '&q=' + req.query.searchQuery, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 console.log(JSON.parse(body).topScoringIntent);
                 var detectedIntent = JSON.parse(body).topScoringIntent.intent;
                 if (detectedIntent == 'createDroplet') {
-                    res.setHeader('content-type', 'application/JSON');
                     res.send(CREATE_DROPLET_DATA);
                 } else if (detectedIntent == 'deleteDroplet') {
                     getAllDropletDetails(res);
@@ -117,7 +118,6 @@ function getAllDropletDetails(res) {
         }
         else {
             console.log(result);
-            res.setHeader('content-type', 'application/JSON');
             var releventData = [];
             for (var i = 0; i < result.droplets.length; i++) {
                 releventData.push({ name: result.droplets[i].name, id: result.droplets[i].id });
