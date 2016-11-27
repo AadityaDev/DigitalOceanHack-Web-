@@ -85,7 +85,7 @@ function createDroplet(name, region, size, image, res) {
     digitalocean.createDroplet(myNewDropletData, function (error, result) {
         if (error) {
             console.log(error);
-            res.end(error);
+            res.end(JSON.stringify(error));
         }
         else {
             console.log(result);
