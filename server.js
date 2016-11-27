@@ -89,7 +89,7 @@ function createDroplet(name, region, size, image, res) {
         }
         else {
             console.log(result);
-            res.end(result);
+            res.end(JSON.stringify(result));
         }
     });
 };
