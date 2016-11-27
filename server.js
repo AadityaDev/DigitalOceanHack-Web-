@@ -85,11 +85,11 @@ function createDroplet(name, region, size, image, res) {
     digitalocean.createDroplet(myNewDropletData, function (error, result) {
         if (error) {
             console.log(error);
-            res.send(error);
+            res.end(error);
         }
         else {
             console.log(result);
-            res.send(result);
+            res.end(result);
         }
     });
 };
@@ -99,11 +99,11 @@ function deleteDroplet(dropletID, res) {
     digitalocean.deleteDroplet(dropletID, function (error, result) {
         if (error) {
             console.log(error);
-            res.send(error);
+            res.end(error);
         }
         else {
             console.log(result);
-            res.send(result);
+            res.end(result);
         }
     });
 };
@@ -122,7 +122,7 @@ function getAllDropletDetails(res) {
             for (var i = 0; i < result.droplets.length; i++) {
                 releventData.push({ name: result.droplets[i].name, id: result.droplets[i].id });
             }
-            res.send(JSON.stringify(releventData));
+            res.end(JSON.stringify(releventData));
         }
     });
 }
