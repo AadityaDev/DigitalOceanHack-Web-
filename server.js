@@ -38,7 +38,7 @@ app.post('/accessToken', function (req, res) {
 
 app.get('/home', function (req, res) {
     res.setHeader('content-type', 'application/JSON');
-    if (req.query.searchQuery != undefined) {
+    if (req.query.searchQuery != undefined && req.query.createDropletData == undefined && req.query.deleteDropletId == undefined) {
         request(model + '&q=' + req.query.searchQuery, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 console.log(JSON.parse(body).topScoringIntent);
@@ -46,7 +46,25 @@ app.get('/home', function (req, res) {
                 if (detectedIntent == 'createDroplet') {
                     res.send(CREATE_DROPLET_DATA);
                 } else if (detectedIntent == 'deleteDroplet') {
-                    getAllDropletDetails(res);
+                    //getAllDropletDetails(res);
+                    var digitalocean = new DIGITALOCEAN(accessToken);
+
+                    digitalocean.listDroplets(function (error3, result3) {
+                        if (error3) {
+                            console.log(error3);
+                            return error3;
+                        }
+                        else {
+                            console.log(result3);
+                            if (result3.droplets != undefined) {
+                                var releventData = [];
+                                for (var i = 0; i < result3.droplets.length; i++) {
+                                    releventData.push({ name: result3.droplets[i].name, id: result3.droplets[i].id });
+                                }
+                                res.end(JSON.stringify(releventData));
+                            }
+                        }
+                    });
                     //deleteDroplet(dropletID);
                 } else {
                     res.send(detectedIntent);
@@ -59,10 +77,46 @@ app.get('/home', function (req, res) {
         var region = JSON.parse(req.query.createDropletData).region;
         var size = JSON.parse(req.query.createDropletData).size;
         var image = JSON.parse(req.query.createDropletData).images;
-        createDroplet(name, region, size, image, res);
+        //createDroplet(name, region, size, image, res);
+        var digitalocean = new DIGITALOCEAN(accessToken);
+        var myNewDropletData = {
+            "name": name,
+            "region": region,
+            "size": size,
+            "image": image,
+            "ssh_keys": null,
+            "backups": false,
+            "ipv6": true,
+            "user_data": null,
+            "private_networking": null
+        }
+
+        digitalocean.createDroplet(myNewDropletData, function (error1, result1) {
+            if (error1) {
+                console.log(error1);
+                res.end(JSON.stringify(error1));
+            }
+            else {
+                console.log(JSON.stringify(result1));
+                //res.setHeader('content-type', 'application/JSON');
+                res.end(JSON.stringify(result1));
+            }
+        });
     }
     else if (req.query.deleteDropletId != undefined) {
-        deleteDroplet(req.query.deleteDropletId,res);
+        //deleteDroplet(req.query.deleteDropletId, res);
+        var digitalocean = new DIGITALOCEAN(accessToken);
+        digitalocean.deleteDroplet(req.query.deleteDropletId, function (error2, result2) {
+            if (error2) {
+                console.log(error2);
+                res.end(JSON.stringify(error2));
+            }
+            else {
+                console.log(result2);
+                //res.setHeader('content-type', 'application/JSON');
+                res.end(JSON.stringify(result2));
+            }
+        });
     } else {
         res.send("please send search query.")
     }
@@ -82,50 +136,33 @@ function createDroplet(name, region, size, image, res) {
         "private_networking": null
     }
 
-    digitalocean.createDroplet(myNewDropletData, function (error, result) {
-        if (error) {
-            console.log(error);
-            res.end(JSON.stringify(error));
+    digitalocean.createDroplet(myNewDropletData, function (error1, result1) {
+        if (error1) {
+            console.log(error1);
+            res.end(JSON.stringify(error1));
         }
         else {
-            console.log(result);
-            res.end(JSON.stringify(result));
+            console.log(JSON.stringify(result1));
+            //res.setHeader('content-type', 'application/JSON');
+            res.end(JSON.stringify(result1));
         }
     });
 };
 
 function deleteDroplet(dropletID, res) {
     var digitalocean = new DIGITALOCEAN(accessToken);
-    digitalocean.deleteDroplet(dropletID, function (error, result) {
-        if (error) {
-            console.log(error);
-            res.end(error);
+    digitalocean.deleteDroplet(dropletID, function (error2, result2) {
+        if (error2) {
+            console.log(error2);
+            res.end(JSON.stringify(error2));
         }
         else {
-            console.log(result);
-            res.end(result);
+            console.log(result2);
+            //res.setHeader('content-type', 'application/JSON');
+            res.end(JSON.stringify(result2));
         }
     });
 };
-
-function getAllDropletDetails(res) {
-    var digitalocean = new DIGITALOCEAN(accessToken);
-
-    digitalocean.listDroplets(function (error, result) {
-        if (error) {
-            console.log(error);
-            return error;
-        }
-        else {
-            console.log(result);
-            var releventData = [];
-            for (var i = 0; i < result.droplets.length; i++) {
-                releventData.push({ name: result.droplets[i].name, id: result.droplets[i].id });
-            }
-            res.end(JSON.stringify(releventData));
-        }
-    });
-}
 
 app.post('/home', function (req, res) {
     res.send("At this moment, it is not defined.");
