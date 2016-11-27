@@ -14,6 +14,10 @@ var CREATE_DROPLET_DATA = {
     "images": ['ubuntu-14-04-x64', 'ubuntu-14-04-x32']
 }
 
+app.get('/',function(req,res){
+    res.send("||||| Introduction: OceanSquare is an intelligent chatbot built to assist a user in carrying out actions on the digital ocean platform.  ||||| Motivation : The aim is to simplify and ease out the actions that a user can perform on digital ocean. This is expected to attract more customers. ||||| Product Description: OceanSquare is an android app,a chatbot. A user can query the bot in simple text in natural language.The NLP module of the bot processes the query and decides about the intention of user.Based on the decision made by the NLP Engine(Luis in this case), the bot proceeds to  one of the two steps; request more information about the query as suggested by the NLP engine, or if the query is right ,fire the query on digitaloecean and ask more details from user if needed and then proceed to complete the task ,alerting the user about the status of the action. ||||| List of Actions that can be performed on digitalocean: Droplet Creation, Droplet Deletion, Droplet Modification,Get List of droplets, Get List of volumes, Get User’s Account Details, Add SSH etc. etc. |||||| OceanSquare can help a user do any of the above mentioned tasks.But due to shortage of time we have managed to make it capable of following actions as listed: ||||| List of Actions that are performed by OceanSquare: Droplet Creation,Droplet Deletion,Get List of droplets ||||| OceanSquare generates QR code for droplet configuration,which helps in duplicating a droplet and its configuration. This QR Code can be shared with friends or teams.");
+})
+
 app.get('/callback', function (req, res) {
     if (req.query.code != undefined) {
         CODE = req.query.code;
